@@ -198,7 +198,7 @@
     </div>
 
     <div class="flex items-center space-x-4 text-xs font-normal select-none">
-      <button onclick="cycleLang()" id="lang-btn" class="hover-text transition-custom cursor-pointer py-1 font-normal">中 en</button>
+      <button onclick="cycleLang()" id="lang-btn" class="hover-text transition-custom cursor-pointer py-1 font-normal">中/En</button>
       <button id="theme-btn" onclick="cycleTheme()" class="hover-text transition-custom cursor-pointer py-1 text-sm leading-none font-normal flex items-center justify-center transition-transform duration-300">○</button>
     </div>
   </header>
@@ -506,7 +506,7 @@
         modeBtnEl.textContent = '🌱';
         actionBtnEl.textContent = currentMode === 'estimate' ? '🕐' : '🌱';
       } else {
-        langBtnEl.textContent = '中 en';
+        langBtnEl.textContent = '中/En';
         modeBtnEl.textContent = t.modeBreakdown;
         actionBtnEl.textContent = currentMode === 'estimate' ? t.actionEstimate : t.actionBreakdown;
       }
