@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>OneLine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      letter-spacing: -0.01em;
+    }
+
+    .transition-custom {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.theme-light { background-color: #FAFAFA !important; color: #111111; }
+    body.theme-light .text-muted { color: #737373; }
+    body.theme-light .divider { border-color: #E5E5E5; }
+    body.theme-light .hover-text:hover { color: #000000; opacity: 0.7; }
+    body.theme-light #theme-btn { color: #111111; }
+
+    body.theme-dark { background-color: #0A0A0A !important; color: #EDEDED; }
+    body.theme-dark .text-muted { color: #8E8E93; }
+    body.theme-dark .divider { border-color: #262626; }
+    body.theme-dark .hover-text:hover { color: #FFFFFF; opacity: 0.7; }
+
+    body.theme-melon { background-color: #E2EEDD !important; color: #182C13; }
+    body.theme-melon .text-muted { color: #44603B; }
+    body.theme-melon .divider { border-color: #C1D8B8; }
+    body.theme-melon .hover-text:hover { color: #000000; opacity: 0.7; }
+
+    .text-green-accent { color: #4A7332; }
+
+    .input-error {
+      outline: 1px solid #ef4444 !important;
+      border-radius: 4px;
+    }
+
+    .timer-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      opacity: 0.6;
+    }
+    .timer-btn:hover {
+      opacity: 1;
+      background: rgba(0,0,0,0.05);
+    }
+    body.theme-dark .timer-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .timer-btn-icon {
+      display: inline-block;
+      line-height: 1;
+    }
+
+    /* 顶部“从何做起”模式切换按钮 */
+    .mode-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      transition: all 0.25s ease;
+      opacity: 0.5;
+      font-weight: 500;
+    }
+    .mode-btn.active {
+      opacity: 1;
+      background: rgba(74, 115, 50, 0.15);
+      color: #4A7332;
+    }
+    body.theme-dark .mode-btn.active {
+      background: rgba(251, 191, 36, 0.15);
+      color: #FBBF24;
+    }
+    .mode-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* 弱化后的“记 / 即”文字切换按钮组件 */
+    .note-toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px 4px;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+      opacity: 0.4;
+      font-weight: 400;
+      color: inherit;
+    }
+    .note-toggle-btn.active {
+      opacity: 0.95;
+      font-weight: 600;
+    }
+    .note-toggle-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* 拆解步骤样式 */
+    .step-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.03);
+      border-left: 2px solid #4A7332;
+      text-align: left;
+    }
+    body.theme-dark .step-item {
+      background: rgba(255,255,255,0.05);
+      border-left-color: #FBBF24;
+    }
+    .step-number {
+      font-weight: 600;
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+    .step-title {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .step-time {
+      font-size: 0.65rem;
+      opacity: 0.5;
+    }
+
+    /* 便签卡片样式 */
+    .note-card {
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.02);
+      transition: all 0.2s ease;
+    }
+    body.theme-dark .note-card {
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* 倾斜短线通用样式 */
+    .tune-slanted-line {
+      display: inline-block;
+      transform: rotate(-22deg);
+      transition: transform 0.3s ease;
+      font-weight: 300;
+    }
+    .tune-trigger:hover .tune-slanted-line {
+      transform: rotate(-22deg) scaleX(1.2);
+    }
+    .tune-link {
+      font-size: 0.75rem;
+      opacity: 0.65;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: block;
+    }
+    .tune-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+  
+    /* 防止 iOS / 移动端点击输入框时页面放大与抖动 */
+    @media screen and (max-width: 768px) {
+      input[type="text"],
+      input[type="password"],
+      textarea {
+        font-size: 16px !important; /* 强制达到 iOS 不放大页面的临界字号 */
+      }
+    }
+
+    /* 禁止页面下拉弹性橡皮筋效果与横向滚动 */
+    html, body {
+      touch-action: manipulation;
+      overscroll-behavior-y: none;
+      overflow-x: hidden;
+    }
+
+  </style>
+</head>
+<body id="app-body" class="theme-light min-h-screen flex flex-col justify-between p-6 sm:p-10 max-w-lg mx-auto selection:bg-emerald-200 selection:text-black">
+
+  <header class="w-full flex items-center justify-between pb-4 border-b divider">
+    <div class="flex items-center">
+      <span class="text-xl font-normal tracking-tight">OneLine</span>
+    </div>
+
+    <div class="flex items-center space-x-4 text-xs font-normal select-none">
+      <button onclick="cycleLang()" id="lang-btn" class="hover-text transition-custom cursor-pointer py-1 font-normal">中 en</button>
+      <button id="theme-btn" onclick="cycleTheme()" class="hover-text transition-custom cursor-pointer py-1 text-sm leading-none font-normal flex items-center justify-center transition-transform duration-300">○</button>
+    </div>
+  </header>
+
+  <main class="w-full flex-1 flex flex-col justify-center my-8 space-y-10">
+
+    <section class="space-y-4">
+      <div class="text-center">
+        <span id="i18n-anchor-sub" class="text-xs italic text-muted opacity-80">让时间是时间</span>
+      </div>
+
+      <div class="pt-2 text-center">
+        <input 
+          type="text" 
+          id="task-input" 
+          placeholder="输入你想做的事（例如：整理桌面、洗个碗...）" 
+          onkeydown="if(event.key === 'Enter') handleAction()"
+          class="w-full text-sm text-center bg-transparent border-b divider pb-2 focus:outline-none transition-custom placeholder:text-neutral-400 dark:placeholder:text-neutral-600"
+        />
+      </div>
+      
+      <div class="pt-2 text-center">
+        <div class="flex items-center justify-center space-x-2 mb-3">
+          <button onclick="toggleBreakdownMode()" id="mode-breakdown-btn" class="mode-btn">
+            <span id="i18n-mode-breakdown">🌱 从何做起</span>
+          </button>
+        </div>
+
+        <button 
+          onclick="handleAction()" 
+          id="action-btn"
+          class="text-xs text-muted hover-text transition-custom cursor-pointer py-1 border-b border-dashed border-neutral-400"
+        >
+          <span id="i18n-action-btn">🕐 估算耗时</span>
+        </button>
+
+        <div id="api-query-result" class="hidden text-xs text-muted pt-4 text-center transition-custom space-y-3">
+          <div class="flex items-center justify-center space-x-3 flex-wrap gap-y-2">
+            <span>⏱️ <span id="i18n-time-prefix">预估耗时:</span> <span id="api-time-val" class="font-bold text-green-accent">~ 3 分钟</span></span>
+            <button 
+              id="start-timer-btn" 
+              onclick="startTimerFromEstimate()" 
+              class="hidden text-xs bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 px-2.5 py-1 rounded transition-colors font-medium cursor-pointer"
+            >
+              ▶ <span id="i18n-timer-start">开始计时</span>
+            </button>
+          </div>
+
+          <div id="active-timer-box" class="hidden pt-2 flex items-center justify-between text-xs">
+            <span id="timer-display" class="font-mono text-2xl font-bold text-green-accent tracking-wider">00:00</span>
+            <div class="flex items-center space-x-1">
+              <button id="pause-timer-btn" onclick="togglePauseTimer()" class="timer-btn" title="暂停/继续">
+                <span class="timer-btn-icon">‖</span>
+              </button>
+              <button onclick="resetTimer()" class="timer-btn" title="重置">
+                <span class="timer-btn-icon">↺</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="breakdown-result" class="hidden text-xs text-muted pt-4 text-center transition-custom">
+          <div id="breakdown-content" class="space-y-2 text-left max-w-sm mx-auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-3">
+      <div class="flex items-center justify-center text-xs text-muted select-none">
+        <div class="flex items-center space-x-1.5">
+          <button id="btn-mode-keep" onclick="switchNoteMode('keep')" class="note-toggle-btn active transition-custom">
+            <span id="i18n-keep-btn">记</span>
+          </button>
+          <span class="opacity-30 text-[10px] font-light">/</span>
+          <button id="btn-mode-instant" onclick="switchNoteMode('instant')" class="note-toggle-btn transition-custom">
+            <span id="i18n-instant-btn">即</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="py-3 border-y divider transition-custom space-y-3">
+        <div class="flex items-end space-x-2">
+          <textarea 
+            id="note-input"
+            rows="2" 
+            placeholder="" 
+            onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); addNote(); }"
+            class="w-full text-xs bg-transparent resize-none focus:outline-none leading-relaxed placeholder:text-neutral-400 dark:placeholder:text-neutral-600"
+          ></textarea>
+          <button 
+            onclick="addNote()" 
+            class="text-xs text-muted hover-text transition-custom cursor-pointer py-1 px-2 whitespace-nowrap opacity-80"
+          >
+            <span id="i18n-add-btn">+ 记录</span>
+          </button>
+        </div>
+
+        <div id="notes-list" class="space-y-2 max-h-48 overflow-y-auto pt-1 pr-1"></div>
+
+        <div class="pt-1 flex justify-end items-center border-t border-dashed divider">
+          <button 
+            id="i18n-clear-notes-btn"
+            onclick="clearNotes()" 
+            class="text-[11px] text-muted hover-text transition-custom cursor-pointer py-0.5 opacity-60"
+          >
+            清空
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="pt-1 text-center select-none">
+      <button 
+        onclick="toggleTuneSection()" 
+        class="tune-trigger group inline-flex items-center justify-center space-x-1.5 py-1 px-3 text-xs text-muted hover-text transition-custom cursor-pointer focus:outline-none"
+      >
+        <span class="tune-slanted-line text-xs">—</span>
+        <span id="tune-trigger-text" class="text-[11px] opacity-0 group-hover:opacity-70 transition-opacity duration-300">调频</span>
+      </button>
+
+      <div id="tune-section" class="hidden pt-2 pb-1 transition-custom space-y-3 max-w-xs mx-auto">
+        <div class="grid grid-cols-2 gap-3 text-center">
+          <div class="space-y-2 p-3 rounded bg-black/[0.02] dark:bg-white/[0.03] flex flex-col items-center justify-center">
+            <div class="text-[11px] font-medium opacity-80 border-b divider pb-1.5 w-full text-center flex items-center justify-center space-x-1">
+              <span id="i18n-tune-enter">进入</span>
+            </div>
+            <div class="flex flex-col space-y-1.5 pt-1 text-center w-full">
+              <a href="https://www.youtube.com/results?search_query=podcast+focus" target="_blank" class="tune-link hover-text"><span id="i18n-link-listen">听</span></a>
+              <a href="https://www.youtube.com/results?search_query=writing+ambient" target="_blank" class="tune-link hover-text"><span id="i18n-link-write">写</span></a>
+            </div>
+          </div>
+
+          <div class="space-y-2 p-3 rounded bg-black/[0.02] dark:bg-white/[0.03] flex flex-col items-center justify-center">
+            <div class="text-[11px] font-medium opacity-80 border-b divider pb-1.5 w-full text-center flex items-center justify-center space-x-1">
+              <span id="i18n-tune-ease">缓和</span>
+            </div>
+            <div class="flex flex-col space-y-1.5 pt-1 text-center w-full">
+              <a href="https://www.xiaohongshu.com/collection/item/6a62cd4c16ff000000000001?xhsshare=CopyLink&appuid=65f82ddb000000000b00f50e&apptime=1784862250&share_id=46b067aea99f4a0ba55eda1a3460f4b6" target="_blank" class="tune-link hover-text space-y-1">
+  <span id="i18n-link-rain" class="block">雨</span>
+  <span id="i18n-link-everything" class="block">一切</span>
+</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="i18n-footer" class="w-full text-center pt-4 border-t divider text-xs text-muted tracking-wide">
+    One thought. One step. One line.
+  </footer>
+
+  <div id="api-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white dark:bg-neutral-900 border divider p-6 max-w-sm w-full space-y-4 rounded-lg shadow-xl text-neutral-800 dark:text-neutral-100">
+      <div class="flex justify-between items-center">
+        <h3 id="i18n-modal-title" class="font-bold text-sm">API Key 设置</h3>
+        <button onclick="closeApiModal()" class="text-xs text-muted hover-text">&times;</button>
+      </div>
+      <p id="i18n-api-tip" class="text-xs text-muted leading-relaxed">
+        输入你的 DeepSeek API Key 即可进行 AI 智能时间估算（仅保存在本地浏览器）。
+      </p>
+      
+      <div class="space-y-2">
+        <input 
+          type="password" 
+          id="user-key-input" 
+          placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx" 
+          class="w-full text-xs p-2 border divider bg-transparent rounded focus:outline-none"
+        />
+        <p class="text-[10px] text-muted opacity-60">💡 没有 Key？去 <a href="https://platform.deepseek.com/" target="_blank" class="underline hover:opacity-80">platform.deepseek.com</a> 获取</p>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-2">
+        <button id="i18n-modal-cancel" onclick="closeApiModal()" class="text-xs text-muted hover-text">取消</button>
+        <button id="i18n-modal-save" onclick="saveApiKey()" class="text-xs bg-emerald-600 text-white px-3 py-1.5 rounded hover:bg-emerald-700 transition-colors font-bold">保存并测试</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. 全局状态
+    // ==========================================
+    let USER_API_KEY = localStorage.getItem('user_api_key') || "";
+    let estimatedMinutes = 0;
+    let timerInterval = null;
+    let totalSecondsLeft = 0;
+    let isTimerPaused = false;
+    let currentMode = 'estimate'; // 'estimate' | 'breakdown'
+    let currentParsedSteps = []; 
+
+    let hasInteractedWithModes = localStorage.getItem('oneline_has_interacted') === 'true';
+
+    // 便签模块状态
+    let currentNoteMode = 'keep'; 
+    let keepNotes = JSON.parse(localStorage.getItem('oneline_keep_notes') || '[]');
+    let instantNotes = []; 
+
+    // 调频模块状态
+    let isTuneOpen = false;
+
+    // ==========================================
+    // 2. 智能时间格式化函数
+    // ==========================================
+    function formatTime(minutes, lang) {
+      if (minutes <= 0) return lang === 'ZH' ? '0 秒' : '0 sec';
+      
+      const totalSeconds = Math.round(minutes * 60);
+
+      if (totalSeconds < 60) {
+        return lang === 'ZH' ? `${totalSeconds} 秒` : `${totalSeconds} sec${totalSeconds > 1 ? 's' : ''}`;
+      }
+
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+
+      const parts = [];
+      
+      if (days > 0) {
+        parts.push(lang === 'ZH' ? `${days} 天` : `${days} day${days > 1 ? 's' : ''}`);
+      }
+      if (hours > 0) {
+        parts.push(lang === 'ZH' ? `${hours} 小时` : `${hours} hour${hours > 1 ? 's' : ''}`);
+      }
+      if (mins > 0) {
+        parts.push(lang === 'ZH' ? `${mins} 分钟` : `${mins} min${mins > 1 ? 's' : ''}`);
+      }
+      if (secs > 0 && days === 0 && hours === 0) {
+        parts.push(lang === 'ZH' ? `${secs} 秒` : `${secs} sec${secs > 1 ? 's' : ''}`);
+      }
+      
+      return parts.join(' ');
+    }
+
+    // ==========================================
+    // 3. API Key 管理
+    // ==========================================
+    function openApiModal() { 
+      document.getElementById('user-key-input').value = USER_API_KEY;
+      document.getElementById('api-modal').classList.remove('hidden'); 
+    }
+    
+    function closeApiModal() { 
+      document.getElementById('api-modal').classList.add('hidden'); 
+    }
+
+    function saveApiKey() {
+      const val = document.getElementById('user-key-input').value.trim();
+      if (!val) {
+        alert('请输入有效的 API Key');
+        return;
+      }
+      USER_API_KEY = val;
+      localStorage.setItem('user_api_key', val);
+      closeApiModal();
+      handleAction();
+    }
+
+    function markUserInteracted() {
+      if (!hasInteractedWithModes) {
+        hasInteractedWithModes = true;
+        localStorage.setItem('oneline_has_interacted', 'true');
+        updateActionButtonsText();
+      }
+    }
+
+    // ==========================================
+    // 4. “从何做起”模式切换
+    // ==========================================
+    function toggleBreakdownMode() {
+      markUserInteracted();
+
+      if (currentMode === 'estimate') {
+        currentMode = 'breakdown';
+        document.getElementById('mode-breakdown-btn').classList.add('active');
+      } else {
+        currentMode = 'estimate';
+        document.getElementById('mode-breakdown-btn').classList.remove('active');
+      }
+
+      updateActionButtonsText();
+      
+      document.getElementById('api-query-result').classList.add('hidden');
+      document.getElementById('breakdown-result').classList.add('hidden');
+      resetTimer();
+    }
+
+    function updateActionButtonsText() {
+      const langBtnEl = document.getElementById('lang-btn');
+      const modeBtnEl = document.getElementById('i18n-mode-breakdown');
+      const actionBtnEl = document.getElementById('i18n-action-btn');
+      const t = translations[currentLang];
+
+      if (hasInteractedWithModes) {
+        langBtnEl.textContent = '/';
+        modeBtnEl.textContent = '🌱';
+        actionBtnEl.textContent = currentMode === 'estimate' ? '🕐' : '🌱';
+      } else {
+        langBtnEl.textContent = '中 en';
+        modeBtnEl.textContent = t.modeBreakdown;
+        actionBtnEl.textContent = currentMode === 'estimate' ? t.actionEstimate : t.actionBreakdown;
+      }
+    }
+
+    // ==========================================
+    // 5. 统一入口
+    // ==========================================
+    function handleAction() {
+      markUserInteracted();
+
+      const inputEl = document.getElementById('task-input');
+      const userInput = inputEl.value.trim();
+
+      if (!userInput) {
+        inputEl.focus();
+        inputEl.classList.add('input-error');
+        setTimeout(() => inputEl.classList.remove('input-error'), 1500);
+        return;
+      }
+
+      if (!USER_API_KEY) {
+        openApiModal();
+        return;
+      }
+
+      if (currentMode === 'estimate') {
+        executeEstimateQuery();
+      } else {
+        executeBreakdownQuery();
+      }
+    }
+
+    // ==========================================
+    // 6. 估算耗时
+    // ==========================================
+    async function executeEstimateQuery() {
+      const userInput = document.getElementById('task-input').value.trim();
+      if (!userInput) return;
+
+      const resultBox = document.getElementById('api-query-result');
+      const timeValEl = document.getElementById('api-time-val');
+      const startBtn = document.getElementById('start-timer-btn');
+
+      document.getElementById('breakdown-result').classList.add('hidden');
+
+      resultBox.classList.remove('hidden');
+      timeValEl.innerText = currentLang === 'ZH' ? '⏳ AI 思考中...' : '⏳ AI thinking...';
+      startBtn.classList.add('hidden');
+
+      try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${USER_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'deepseek-v4-pro',
+            messages: [
+              {
+                role: 'system',
+                content: `你是一个精细、理性的时间管理助手。用户会描述一个动作或任务，你需要非常精准地预估出完成它所需的实际时间（单位：分钟）。
+核心原则：
+1. 【安全审查】如果用户输入涉及危险、违法、自残、暴力或有害信息，请直接且仅回复 "-1"。
+2. 极小微动作（如：合上电脑、喝口水）：耗时只需要几秒到十几秒，必须返回小数（如 0.25 或 0.5），绝对不要随手填 1 分钟！
+3. 短日常任务预估 2-5 分钟，中等任务 10-25 分钟，大型任务 30-60 分钟.
+输出要求：
+- 只回复一个纯数字（可为浮点数或负数），绝对不要带任何单位或解释！`
+              },
+              { role: 'user', content: userInput }
+            ],
+            temperature: 0.1,
+            // 【关键修改点：放大 token 限额】
+            // v4-pro 会带有内生的 <think> 过程，10个token会把它憋死中途断掉，导致提取不出数字。
+            max_tokens: 200 
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errMsg = data.error?.message || '未知错误';
+          if (response.status === 401) {
+            timeValEl.innerText = currentLang === 'ZH' ? '❌ API Key 无效，请重新设置' : '❌ Invalid API Key';
+            setTimeout(() => openApiModal(), 1000);
+            return;
+          }
+          timeValEl.innerText = currentLang === 'ZH' ? `❌ 错误: ${errMsg}` : `❌ Error: ${errMsg}`;
+          return;
+        }
+
+        const rawReply = data.choices[0].message.content.trim();
+
+        // 1. 剔除 DeepSeek 可能返回的 <think> 思维过程（兼容未闭合的意外情况）
+        const cleanReply = rawReply.replace(/<think>[\s\S]*?(<\/think>|$)/gi, '').trim();
+
+        // 2. 增强版正则：支持提取负数和浮点数 (例如 "-1", "0.25", "5")
+        const match = cleanReply.match(/-?\d+(\.\d+)?/);
+        const parsedMinutes = match ? parseFloat(match[0]) : NaN;
+
+        // 3. 安全审查拦截
+        if (parsedMinutes === -1) {
+          timeValEl.innerHTML = `<span class="text-red-500 font-medium">${currentLang === 'ZH' ? '⚠️ 提醒：检测到危险或不安全内容，已拒绝估算' : '⚠️ Warning: Unsafe content detected, estimation refused'}</span>`;
+          return;
+        }
+
+        // 4. 异常捕获并显示日志
+        if (isNaN(parsedMinutes) || parsedMinutes <= 0) {
+          console.error("AI 原始返回:", rawReply); // 留存日志，如果还报错可以在浏览器控制台看到大模型到底发了什么神经
+          timeValEl.innerText = currentLang === 'ZH' ? '⚠️ AI 返回异常，请重试' : '⚠️ Invalid response, retry';
+          return;
+        }
+
+        // 5. 成功渲染
+        estimatedMinutes = parsedMinutes;
+        const formattedTime = formatTime(parsedMinutes, currentLang);
+        timeValEl.innerText = `~ ${formattedTime}`;
+        startBtn.classList.remove('hidden');
+
+      } catch (error) {
+        console.error('DeepSeek API 调用失败:', error);
+        timeValEl.innerText = currentLang === 'ZH' ? '🌐 网络错误，请检查连接' : '🌐 Network error';
+      }
+    }
+
+    // ==========================================
+    // 7. 任务拆解
+    // ==========================================
+    async function executeBreakdownQuery() {
+      const userInput = document.getElementById('task-input').value.trim();
+      if (!userInput) return;
+
+      const resultBox = document.getElementById('breakdown-result');
+      const contentEl = document.getElementById('breakdown-content');
+
+      document.getElementById('api-query-result').classList.add('hidden');
+
+      resultBox.classList.remove('hidden');
+      contentEl.innerHTML = `<div class="text-center text-muted">${currentLang === 'ZH' ? '⏳ AI 思考中...' : '⏳ AI thinking...'}</div>`;
+
+      try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${USER_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'deepseek-v4-pro',
+            response_format: { type: "json_object" },
+            messages: [
+              {
+                role: 'system',
+                content: `你是一个极简主义任务拆解助手。你需要将用户的任务拆解成 3-5 个简单可执行的小步骤。
+为了支持双语无缝切换，请严格输出 JSON 格式，其中每个步骤同时包含中文(titleZh)和英文(titleEn)翻译，以及预估时间(minutes)。
+
+拆解原则：
+1. 【安全审查】如果用户输入涉及危险、违法、自残、暴力或有害信息（无论任何语言），请直接输出 JSON: {"isDangerous": true}，不要输出其他内容。
+2. 正常情况下，第一步必须是一个几乎零阻力、几秒钟即可完成的微小动作（如：打开文档、拿出笔）。
+3. 每一步耗时按实际评估，用分钟数值表示（几秒钟用小数表示，如 15秒=0.25，30秒=0.5）。
+
+JSON 输出格式样例：
+{
+  "steps": [
+    { "titleZh": "打开笔记软件", "titleEn": "Open note app", "minutes": 0.1 },
+    { "titleZh": "新建一篇空白页面", "titleEn": "Create a new blank page", "minutes": 0.2 },
+    { "titleZh": "写下大纲提纲", "titleEn": "Draft the main outline", "minutes": 5 }
+  ]
+}`
+              },
+              { role: 'user', content: userInput }
+            ],
+            temperature: 0.3,
+            max_tokens: 600
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errMsg = data.error?.message || '未知错误';
+          if (response.status === 401) {
+            contentEl.innerHTML = `<div class="text-center text-muted">${currentLang === 'ZH' ? '❌ API Key 无效，请重新设置' : '❌ Invalid API Key'}</div>`;
+            setTimeout(() => openApiModal(), 1000);
+            return;
+          }
+          contentEl.innerHTML = `<div class="text-center text-muted">${currentLang === 'ZH' ? '❌ 错误: ' : '❌ Error: '}${errMsg}</div>`;
+          return;
+        }
+
+        const rawContent = data.choices[0].message.content.trim();
+        const jsonRes = JSON.parse(rawContent);
+
+        if (jsonRes && jsonRes.isDangerous) {
+          contentEl.innerHTML = `<div class="text-center text-red-500 font-medium">${currentLang === 'ZH' ? '⚠️ 提醒：检测到危险或不安全内容，已拒绝处理。' : '⚠️ Warning: Unsafe content detected, request refused.'}</div>`;
+          return;
+        }
+
+        if (jsonRes && Array.isArray(jsonRes.steps)) {
+          currentParsedSteps = jsonRes.steps;
+          renderBreakdownSteps();
+        } else {
+          contentEl.innerHTML = `<div class="text-center text-muted">${currentLang === 'ZH' ? '⚠️ AI 返回异常，请重试' : '⚠️ Invalid response, retry'}</div>`;
+        }
+
+      } catch (error) {
+        console.error('DeepSeek API 调用失败:', error);
+        contentEl.innerHTML = `<div class="text-center text-muted">${currentLang === 'ZH' ? '🌐 网络错误，请检查连接' : '🌐 Network error'}</div>`;
+      }
+    }
+
+    // ==========================================
+    // 8. 实时无缝渲染拆解步骤
+    // ==========================================
+    function renderBreakdownSteps() {
+      const contentEl = document.getElementById('breakdown-content');
+      if (!currentParsedSteps || currentParsedSteps.length === 0) return;
+
+      let html = '';
+      currentParsedSteps.forEach((step, index) => {
+        const title = currentLang === 'ZH' ? (step.titleZh || step.titleEn) : (step.titleEn || step.titleZh);
+        const formattedTimeStr = formatTime(step.minutes || 1, currentLang);
+        const prefix = currentLang === 'ZH' ? '约 ' : '~ ';
+
+        html += `
+          <div class="step-item">
+            <div class="step-number">Step ${index + 1}</div>
+            <div class="step-title">${escapeHtml(title)}</div>
+            <div class="step-time">${prefix}${formattedTimeStr}</div>
+          </div>
+        `;
+      });
+      
+      const encouragement = currentLang === 'ZH' ? '✨ 慢慢来，做一点是一点' : '✨ Take it easy, one step at a time';
+      html += `<div class="text-center text-muted text-[0.65rem] pt-2 opacity-60">${encouragement}</div>`;
+      
+      contentEl.innerHTML = html;
+    }
+
+    // ==========================================
+    // 9. 计时器
+    // ==========================================
+    function startTimerFromEstimate() {
+      if (estimatedMinutes <= 0) return;
+      totalSecondsLeft = Math.round(estimatedMinutes * 60);
+      isTimerPaused = false;
+      document.getElementById('active-timer-box').classList.remove('hidden');
+      document.getElementById('start-timer-btn').classList.add('hidden');
+      updateTimerDisplay();
+
+      document.getElementById('pause-timer-btn').querySelector('.timer-btn-icon').textContent = '‖';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isTimerPaused) {
+          totalSecondsLeft--;
+          if (totalSecondsLeft <= 0) {
+            clearInterval(timerInterval);
+            const doneText = currentLang === 'ZH' ? '结束啦！' : 'Done!';
+            document.getElementById('timer-display').innerText = doneText;
+            return;
+          }
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const totalSec = totalSecondsLeft;
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      let display = '';
+      if (days > 0) display += `${days}d `;
+      if (hours > 0 || days > 0) display += `${String(hours).padStart(2, '0')}h `;
+      display += `${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
+      
+      document.getElementById('timer-display').innerText = display.trim();
+    }
+
+    function togglePauseTimer() {
+      isTimerPaused = !isTimerPaused;
+      const iconEl = document.getElementById('pause-timer-btn').querySelector('.timer-btn-icon');
+      iconEl.textContent = isTimerPaused ? '—' : '‖';
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      totalSecondsLeft = 0;
+      isTimerPaused = false;
+      document.getElementById('active-timer-box').classList.add('hidden');
+      document.getElementById('start-timer-btn').classList.remove('hidden');
+      document.getElementById('pause-timer-btn').querySelector('.timer-btn-icon').textContent = '‖';
+    }
+
+    // ==========================================
+    // 10. 便签空间模块 (Keep / Instant - 精简透明设计)
+    // ==========================================
+    function getNoteDateObject() {
+      const now = new Date();
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return {
+        zh: `${now.getMonth() + 1}.${now.getDate()}`,
+        en: `${months[now.getMonth()]} ${now.getDate()}`
+      };
+    }
+
+    function switchNoteMode(mode) {
+      currentNoteMode = mode;
+      const btnKeep = document.getElementById('btn-mode-keep');
+      const btnInstant = document.getElementById('btn-mode-instant');
+
+      if (mode === 'keep') {
+        btnKeep.classList.add('active');
+        btnInstant.classList.remove('active');
+      } else {
+        btnInstant.classList.add('active');
+        btnKeep.classList.remove('active');
+      }
+
+      document.getElementById('note-input').placeholder = currentLang === 'ZH' 
+        ? (mode === 'keep' ? '记录需要长期留存的内容...' : '随时写下突发的思绪，关闭页面即清空...') 
+        : (mode === 'keep' ? 'Keep thoughts for later...' : 'Dump instant thoughts...');
+
+      renderNotes();
+    }
+
+    function addNote() {
+      const input = document.getElementById('note-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const dateObj = getNoteDateObject();
+      const newNote = {
+        id: Date.now(),
+        text: text,
+        dateZh: dateObj.zh,
+        dateEn: dateObj.en
+      };
+
+      if (currentNoteMode === 'keep') {
+        keepNotes.unshift(newNote);
+        localStorage.setItem('oneline_keep_notes', JSON.stringify(keepNotes));
+      } else {
+        instantNotes.unshift(newNote);
+      }
+
+      input.value = '';
+      renderNotes();
+    }
+
+    function deleteNote(id) {
+      if (currentNoteMode === 'keep') {
+        keepNotes = keepNotes.filter(n => n.id !== id);
+        localStorage.setItem('oneline_keep_notes', JSON.stringify(keepNotes));
+      } else {
+        instantNotes = instantNotes.filter(n => n.id !== id);
+      }
+      renderNotes();
+    }
+
+    function clearNotes() {
+      if (currentNoteMode === 'keep') {
+        if (keepNotes.length === 0) return;
+        const confirmMsg = currentLang === 'ZH' ? '确认要清空所有【Keep 记录】吗？此操作无法恢复。' : 'Are you sure you want to clear all Keep notes?';
+        if (confirm(confirmMsg)) {
+          keepNotes = [];
+          localStorage.removeItem('oneline_keep_notes');
+          renderNotes();
+        }
+      } else {
+        instantNotes = [];
+        renderNotes();
+      }
+    }
+
+    function renderNotes() {
+      const listEl = document.getElementById('notes-list');
+      const notes = currentNoteMode === 'keep' ? keepNotes : instantNotes;
+
+      if (notes.length === 0) {
+        const emptyMsg = currentLang === 'ZH' 
+          ? (currentNoteMode === 'keep' ? '暂无记录' : '暂无即时思绪') 
+          : 'Empty';
+        listEl.innerHTML = `<div class="text-center text-muted text-[11px] py-2 opacity-50 italic">${emptyMsg}</div>`;
+        return;
+      }
+
+      let html = '';
+      notes.forEach(note => {
+        const displayDateZh = note.dateZh || note.date || getNoteDateObject().zh;
+        const displayDateEn = note.dateEn || note.date || getNoteDateObject().en;
+
+        const textContent = `<div class="flex-1 whitespace-pre-wrap break-words leading-relaxed">${escapeHtml(note.text)}</div>`;
+        
+        let dateTag = '';
+        if (currentNoteMode === 'keep') {
+          const dateStr = currentLang === 'ZH' ? displayDateZh : displayDateEn;
+          dateTag = `<span class="text-[10px] text-muted opacity-60">${dateStr}</span>`;
+        }
+
+        const deleteBtn = `<button onclick="deleteNote(${note.id})" class="text-muted hover-text opacity-0 group-hover:opacity-60 transition-opacity text-[11px]">✕</button>`;
+
+        if (currentLang === 'ZH') {
+          html += `
+            <div class="note-card flex items-start justify-between space-x-2 text-xs group">
+              ${textContent}
+              <div class="flex items-center space-x-2 shrink-0 pt-0.5 select-none">
+                ${dateTag}
+                ${deleteBtn}
+              </div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="note-card flex items-start space-x-2 text-xs group">
+              ${dateTag ? `<div class="shrink-0 pt-0.5 select-none">${dateTag}</div>` : ''}
+              ${textContent}
+              <div class="shrink-0 pt-0.5 select-none">
+                ${deleteBtn}
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      listEl.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    // ==========================================
+    // 11. 环境调频模块交互逻辑 (Tune In)
+    // ==========================================
+    function toggleTuneSection() {
+      isTuneOpen = !isTuneOpen;
+      const tuneSec = document.getElementById('tune-section');
+      const triggerText = document.getElementById('tune-trigger-text');
+
+      if (isTuneOpen) {
+        tuneSec.classList.remove('hidden');
+        triggerText.style.opacity = '1';
+      } else {
+        tuneSec.classList.add('hidden');
+        triggerText.style.opacity = '';
+      }
+    }
+
+    // ==========================================
+    // 12. 自定义矢量图标主题切换
+    // ==========================================
+    const svgMoon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" style="transform: rotate(-30deg);"><path d="M12.3 2a10 10 0 0 0 9.7 12.3 10 10 0 1 1-9.7-12.3z"/></svg>`;
+    const svgMelonLine = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3A572D" stroke-width="2.5" stroke-linecap="round"><path d="M5 16C9 20 15 20 19 16"/></svg>`;
+
+    const themes = [
+      { name: 'theme-light', icon: '○' },
+      { name: 'theme-dark', icon: svgMoon },
+      { name: 'theme-melon', icon: svgMelonLine }
+    ];
+    let currentThemeIdx = 0;
+
+    function applyTheme(index) {
+      document.body.className = themes[index].name + " min-h-screen flex flex-col justify-between p-6 sm:p-10 max-w-lg mx-auto selection:bg-emerald-200 selection:text-black";
+      const btnEl = document.getElementById('theme-btn');
+      btnEl.innerHTML = themes[index].icon;
+      btnEl.style.transform = 'rotate(180deg)';
+      setTimeout(() => btnEl.style.transform = 'rotate(0deg)', 300);
+    }
+
+    function cycleTheme() {
+      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+      applyTheme(currentThemeIdx);
+    }
+
+    // ==========================================
+    // 13. 多语言与智能记忆
+    // ==========================================
+    const translations = {
+      ZH: {
+        anchorSub: "让时间是时间",
+        taskPlaceholder: "输入你想做的事（例如：整理桌面、洗个碗...）",
+        actionEstimate: "🕐 估算耗时",
+        actionBreakdown: "🌱 拆解任务",
+        modeBreakdown: "🌱 从何做起",
+        timePrefix: "预估耗时:",
+        timerStart: "开始计时",
+        keepBtn: "记",
+        instantBtn: "即",
+        addBtn: "+ 记录",
+        clearBtn: "清空",
+        modalTitle: "API Key 设置",
+        apiTip: "输入你的 DeepSeek API Key 即可进行 AI 智能时间估算（仅保存在本地浏览器）。",
+        modalCancel: "取消",
+        modalSave: "保存并测试",
+        footer: "One thought. One step. One line.",
+        tuneTrigger: "调频",
+        tuneEnter: "进入",
+        tuneEase: "缓和",
+        linkListen: "听",
+        linkWrite: "写",
+        linkRain: "雨",
+        linkEverything: "一切"
+      },
+      EN: {
+        anchorSub: "Time is just time.",
+        taskPlaceholder: "Type what you want to do (e.g., clean desk, wash dishes...)",
+        actionEstimate: "🕐 Estimate Time",
+        actionBreakdown: "🌱 Break Down",
+        modeBreakdown: "🌱 Make it smaller ⭐",
+        timePrefix: "Est. Time:",
+        timerStart: "Start Timer",
+        keepBtn: "Keep",
+        instantBtn: "Instant",
+        addBtn: "+ Add",
+        clearBtn: "Clear",
+        modalTitle: "API Key Settings",
+        apiTip: "Enter your DeepSeek API Key for AI-powered time estimation (stored locally only).",
+        modalCancel: "Cancel",
+        modalSave: "Save & Test",
+        footer: "One thought. One step. One line.",
+        tuneTrigger: "Tune",
+        tuneEnter: "Enter",
+        tuneEase: "Ease",
+        linkListen: "Listen",
+        linkWrite: "Write",
+        linkRain: "Rain",
+        linkEverything: "Everything"
+      }
+    };
+    let currentLang = 'ZH';
+
+    function cycleLang() {
+      markUserInteracted();
+
+      currentLang = currentLang === 'ZH' ? 'EN' : 'ZH';
+      const t = translations[currentLang];
+
+      document.getElementById('i18n-anchor-sub').innerText = t.anchorSub;
+      document.getElementById('task-input').placeholder = t.taskPlaceholder;
+      
+      updateActionButtonsText();
+      
+      document.getElementById('i18n-time-prefix').innerText = t.timePrefix;
+      document.getElementById('i18n-timer-start').innerText = t.timerStart;
+      
+      document.getElementById('i18n-keep-btn').innerText = t.keepBtn;
+      document.getElementById('i18n-instant-btn').innerText = t.instantBtn;
+      document.getElementById('i18n-add-btn').innerText = t.addBtn;
+      document.getElementById('i18n-clear-notes-btn').innerText = t.clearBtn;
+
+      document.getElementById('i18n-modal-title').innerText = t.modalTitle;
+      document.getElementById('i18n-api-tip').innerText = t.apiTip;
+      document.getElementById('i18n-modal-cancel').innerText = t.modalCancel;
+      document.getElementById('i18n-modal-save').innerText = t.modalSave;
+      document.getElementById('i18n-footer').innerText = t.footer;
+
+      document.getElementById('tune-trigger-text').innerText = t.tuneTrigger;
+      document.getElementById('i18n-tune-enter').innerText = t.tuneEnter;
+      document.getElementById('i18n-tune-ease').innerText = t.tuneEase;
+      document.getElementById('i18n-link-listen').innerText = t.linkListen;
+      document.getElementById('i18n-link-write').innerText = t.linkWrite;
+      document.getElementById('i18n-link-rain').innerText = t.linkRain;
+      document.getElementById('i18n-link-everything').innerText = t.linkEverything;
+
+      if (estimatedMinutes > 0) {
+        document.getElementById('api-time-val').innerText = `~ ${formatTime(estimatedMinutes, currentLang)}`;
+      }
+
+      renderBreakdownSteps();
+      switchNoteMode(currentNoteMode);
+
+      const timerDisplayEl = document.getElementById('timer-display');
+      if (totalSecondsLeft <= 0 && (timerDisplayEl.innerText === '结束啦！' || timerDisplayEl.innerText === 'Done!')) {
+        timerDisplayEl.innerText = currentLang === 'ZH' ? '结束啦！' : 'Done!';
+      }
+    }
+
+    // 初始化运行
+    switchNoteMode('keep');
+    updateActionButtonsText();
+
+    console.log('🚀 OneLine 已加载');
+  </script>
+</body>
+</html>
