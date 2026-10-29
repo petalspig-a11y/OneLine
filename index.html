@@ -236,7 +236,7 @@
           class="text-xs text-muted hover-text transition-custom cursor-pointer py-1 border-b border-dashed border-neutral-400"
         >
           <span id="i18n-action-btn" class="flex items-center justify-center gap-1.5">
-  <img src="timer.png" alt="timer" class="w-3.5 h-3.5 opacity-80 inline-block object-contain">
+  <img src="timer.png" alt="timer" class="w-5 h-5 opacity-100 inline-block object-contain">
   <span class="action-text">估算耗时</span>
 </span>
         </button>
@@ -506,8 +506,8 @@
       const t = translations[currentLang];
 
       // 1. 先定义好图片的 HTML 字符串
-      const startIcon = `<img src="start.png" class="w-3.5 h-3.5 opacity-80 inline-block object-contain dark:invert">`;
-      const timerIcon = `<img src="timer.png" class="w-3.5 h-3.5 opacity-80 inline-block object-contain dark:invert">`;
+      const startIcon = `<img src="start.png" class="w-5 h-5 opacity-100 inline-block object-contain dark:invert">`;
+      const timerIcon = `<img src="timer.png" class="w-5 h-5 opacity-100 inline-block object-contain dark:invert">`;
 
       if (hasInteractedWithModes) {
         langBtnEl.textContent = '/';
@@ -570,8 +570,8 @@
 
       resultBox.classList.remove('hidden');
       timeValEl.innerHTML = currentLang === 'ZH' 
-  ? '<img src="thinking.png" class="w-3.5 h-3.5 inline-block animate-pulse opacity-70 mr-1 object-contain align-middle"> AI 思考中...' 
-  : '<img src="thinking.png" class="w-3.5 h-3.5 inline-block animate-pulse opacity-70 mr-1 object-contain align-middle"> AI thinking...';
+  ? '<img src="thinking.png" class="w-5 h-5 inline-block animate-pulse opacity-100 mr-1 object-contain align-middle"> AI 思考中...' 
+  : '<img src="thinking.png" class="w-5 h-5 inline-block animate-pulse opacity-100 mr-1 object-contain align-middle"> AI thinking...';
 
       try {
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -663,7 +663,7 @@
 
       resultBox.classList.remove('hidden');
      contentEl.innerHTML = `<div class="text-center text-muted flex items-center justify-center gap-1.5">
-  <img src="thinking.png" class="w-3.5 h-3.5 animate-pulse opacity-70 object-contain"> 
+  <img src="thinking.png" class="w-5 h-5 animate-pulse opacity-100 object-contain"> 
   ${currentLang === 'ZH' ? 'AI 思考中...' : 'AI thinking...'}
 </div>`;
 
